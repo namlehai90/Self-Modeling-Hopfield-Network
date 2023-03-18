@@ -1,0 +1,2 @@
+# Self-Modeling-Hopfield-Network
+ 
