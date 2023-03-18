@@ -6,8 +6,8 @@ Overview
 
 This repository includes two Python scripts:
 
-m1_random.py: This script implements the self-modeling Hopfield network for random weights and reproduces the experiment reported in Figure 2 of the paper.
-m1_modular_csp.py: This script implements the self-modeling Hopfield network to solve a modular weighted-2-max-sat problem and reproduces the experiment reported in Figure 3 of the paper.
+1. m1_random.py: This script implements the self-modeling Hopfield network for random weights and reproduces the experiment reported in Figure 2 of the paper.
+2. m1_modular_csp.py: This script implements the self-modeling Hopfield network to solve a modular weighted-2-max-sat problem and reproduces the experiment reported in Figure 3 of the paper.
 
 In addition, the m1_100_trial.py script runs 100 independent trials of the m1_modular_csp.py experiment.
 
