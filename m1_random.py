@@ -15,6 +15,7 @@ relaxation1 = 1000 # relaxation length without learning
 relaxation2 = 1000 # relaxation length with learning
 beta = 1.0 # inverse temperature parameter
 learning_rate = 0.0025 # learning rate parameter: 0.0025, 0.001, 0.01
+tau = 100 # number of state updates/duration of each relaxation
 
 # Define energy function
 def energy(state, weights):
@@ -64,15 +65,15 @@ for i in range(relaxation1+relaxation2):
     else:
         print(f"Energy at relaxation {i+1} with learning is {energy_i:.3f}")
         energies2.append(energy_i)
-        
-    for j in range(N):
+    for j in range(tau):
+        j = j%N
         energy_i = energy(state, init_weights)
     
         # save energy across state updates for 5 relaxations
-        if i < 5:
+        if i < 10:
             first_relax.append(energy_i)
         else:
-            if i >= relaxation1 and i < relaxation1+5:
+            if i >= relaxation1 and i < relaxation1+10:
                 first_learning_relax.append(energy_i)
         # k = np.random.randint(0, N)
         # pick a state from a permutation
@@ -82,11 +83,18 @@ for i in range(relaxation1+relaxation2):
             delta_weights = learning_rate * np.outer(state[k], state)
             init_weights[k] += delta_weights.reshape(N,)
             
+    # if i < relaxation1:
+    #     print(f"Energy at relaxation {i+1} without learning is {energy_i:.3f}")
+    #     energies1.append(energy_i)
+    # else:
+    #     print(f"Energy at relaxation {i+1} with learning is {energy_i:.3f}")
+    #     energies2.append(energy_i)
+            
     relax_states.append(state)
             
 # Plot energy vs state updates for first relaxation for non learning
 plt.figure(1)
-for i in range(5):
+for i in range(10):
     start_idx = i * N
     end_idx = (i + 1) * N
     energy_line = first_relax[start_idx:end_idx]
@@ -95,11 +103,12 @@ plt.xlabel('State updates')
 plt.ylabel('Energy')
 plt.title('Energy vs State Updates for Nonlearning (First 5 Relaxations)')
 plt.legend()
+plt.savefig("energy_nonlearning.png")
 plt.show()
 
 # Plot energy vs state updates for first relaxation for learning
 plt.figure(2)
-for i in range(5):
+for i in range(10):
     start_idx = i * N
     end_idx = (i + 1) * N
     energy_line = first_learning_relax[start_idx:end_idx]
@@ -108,6 +117,7 @@ plt.xlabel('State updates')
 plt.ylabel('Energy')
 plt.title('Energy vs State Updates for Learning (First 5 Relaxations)')
 plt.legend()
+plt.savefig("energy_learning.png")
 plt.show()
 
 # Concatenate the energy lists and create a list of colors for the scatter plot
@@ -117,6 +127,8 @@ colors = ['red']*relaxation1 + ['blue']*relaxation2
 
 # Plot energy vs relaxations for nonlearning
 plt.scatter(range(relaxation1), energies1, s=2, label='Non-learning')
+# Find the minimum energy value in the non-learning phase
+min_energy_nonlearning = min(energies1)
 
 # Plot energy vs relaxations for learning
 plt.scatter(range(relaxation1, relaxation1+relaxation2), energies2, s=2, label='Learning')
@@ -125,10 +137,14 @@ plt.scatter(range(relaxation1, relaxation1+relaxation2), energies2, s=2, label='
 plt.axvline(x=relaxation1, linestyle='--', color='black', label='Turning Point')
 plt.annotate('Non-learning', xy=(0.25, 0.85), xycoords='figure fraction', color='red')
 plt.annotate('Learning', xy=(0.65, 0.85), xycoords='figure fraction', color='blue')
+# Add a broken-line to indicate the lowest energy point that non-learning relaxation can reach
+plt.axhline(y=min_energy_nonlearning, linestyle='--', color='green', label='Lowest Energy (Non-learning)')
+
 plt.xlabel('Relaxation')
 plt.ylabel('Energy')
 plt.title('Energy vs Relaxations')
 plt.legend()
+plt.savefig("energy_relaxation.png")
 plt.show()
 
 # Plot histograms of attractor energies before and after learning
@@ -139,6 +155,7 @@ plt.xlabel('Final Energy')
 plt.ylabel('Count')
 plt.title('Histogram of Attractor Energies Before and After Learning')
 plt.legend()
+plt.savefig("energy_histogram.png")
 plt.show()
 
 # Visualize final state
